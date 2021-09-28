@@ -1,8 +1,16 @@
 <template>
   <div class="pagination">
-    <button v-for="page in pagesCount" :key="page">
+    <a class="pagination__link" @click="setPage(curPage - 1)">&lt;</a>
+    <a
+      class="pagination__link"
+      :class="{ active: page === curPage }"
+      v-for="page in generatePages"
+      :key="page"
+      @click="setPage(page)"
+    >
       {{ page }}
-    </button>
+    </a>
+    <a class="pagination__link" @click="setPage(curPage + 1)">&gt;</a>
   </div>
 </template>
 
@@ -13,22 +21,53 @@ export default {
     itemsCount: {
       type: Number,
     },
-  },
-  data() {
-    return {
-      pagesCount: null,
-      countItemOfPage: 5,
-    };
-  },
-  methods: {
-    generatePages() {
-      return Math.ceil(this.itemsCount / this.countItemOfPage);
+    curPage: {
+      type: Number,
+    },
+    count: {
+      type: Number,
     },
   },
-  created() {
-    this.pagesCount = this.generatePages();
+  data() {
+    return {};
+  },
+  computed: {
+    generatePages() {
+      return Math.ceil(this.itemsCount / this.count);
+    },
+  },
+  methods: {
+    setPage(page) {
+      if (page < 1 || page > this.generatePages) {
+        return;
+      }
+      this.$emit('paginate', page);
+    },
   },
 };
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.pagination {
+  margin-top: 20px;
+
+  &__link {
+    cursor: pointer;
+    padding: 5px;
+
+    & + .active {
+      background-color: gray;
+      color: white;
+    }
+
+    &:hover {
+      background: gray;
+      color: white;
+    }
+
+    &:not(:last-child) {
+      margin-right: 5px;
+    }
+  }
+}
+</style>

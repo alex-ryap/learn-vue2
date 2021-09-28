@@ -13,8 +13,13 @@
             Add new cost
           </button>
           <AddPaymentForm @addNewPayment="addPayment" v-if="showPaymentForm" />
-          <PaymentDisplay :items="paymentsList" />
-          <Pagination :itemsCount="paymentsLength" />
+          <PaymentDisplay :items="displayedPayments" />
+          <Pagination
+            :itemsCount="paymentsList.length"
+            :curPage="currentPage"
+            :count="paymentsCountOfPage"
+            @paginate="setPage"
+          />
         </div>
       </main>
     </div>
@@ -35,9 +40,18 @@ export default {
   },
   data: () => ({
     paymentsList: [],
-    paymentsLength: null,
     showPaymentForm: false,
+    currentPage: 1,
+    paymentsCountOfPage: 10,
   }),
+  computed: {
+    displayedPayments() {
+      return this.paymentsList.slice(
+        this.currentPage * this.paymentsCountOfPage - this.paymentsCountOfPage,
+        this.currentPage * this.paymentsCountOfPage
+      );
+    },
+  },
   methods: {
     fetchData() {
       return [
@@ -204,10 +218,13 @@ export default {
       payment.id = this.paymentsList.length + 1;
       this.paymentsList.push(payment);
     },
+
+    setPage(page) {
+      this.currentPage = page;
+    },
   },
   created() {
     this.paymentsList = this.fetchData();
-    this.paymentsLength = this.paymentsList.length;
   },
 };
 </script>
